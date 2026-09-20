@@ -25,11 +25,6 @@ internal sealed class LeafApplication : XamlApplication
 {
     private ReminderController? _controller;
 
-    public LeafApplication()
-    {
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => _controller?.Dispose();
-    }
-
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         _controller = new ReminderController();

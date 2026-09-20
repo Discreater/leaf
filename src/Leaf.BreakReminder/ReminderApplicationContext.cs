@@ -118,8 +118,8 @@ internal sealed class ReminderController : IDisposable
     private void UpdateFullscreenState(DateTimeOffset now)
     {
         var currentWindowHandles = _activeWindows
-            .Where(window => !window.IsDisposed)
             .Select(window => window.Handle)
+            .Where(handle => handle != IntPtr.Zero)
             .ToArray();
 
         var isFullscreen = FullscreenDetector.IsFullscreenForegroundWindow(currentWindowHandles);

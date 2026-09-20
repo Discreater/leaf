@@ -63,7 +63,7 @@ internal sealed class BreakReminderWindow : Window
 
     public bool IsDisposed => _isClosed;
 
-    public nint Handle => _windowHandle;
+    public nint Handle => _isClosed ? IntPtr.Zero : _windowHandle;
 
     public void UpdateContent(int elapsedWorkMinutes, int breakDurationMinutes, TimeSpan remaining)
     {

@@ -165,9 +165,21 @@ internal sealed class BreakReminderWindow : Window
                 workingArea.Left + ((workingArea.Width - WindowWidth) / 2),
                 workingArea.Top + ((workingArea.Height - WindowHeight) / 2)));
 
+        Marshal.SetLastPInvokeError(0);
         var style = GetWindowLong(_windowHandle, GwlStyle);
+        if (style == 0 && Marshal.GetLastPInvokeError() != 0)
+        {
+            return;
+        }
+
         style &= ~WsSysMenu;
-        SetWindowLong(_windowHandle, GwlStyle, style);
+        Marshal.SetLastPInvokeError(0);
+        var previousStyle = SetWindowLong(_windowHandle, GwlStyle, style);
+        if (previousStyle == 0 && Marshal.GetLastPInvokeError() != 0)
+        {
+            return;
+        }
+
         SetWindowPos(_windowHandle, IntPtr.Zero, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoZOrder | SwpFrameChanged);
     }
 

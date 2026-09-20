@@ -42,4 +42,10 @@ internal sealed class LeafApplication : XamlApplication, IDisposable
         _controller?.Dispose();
         _controller = null;
     }
+
+    public void RequestExit()
+    {
+        Dispose();
+        Exit();
+    }
 }

@@ -5,6 +5,7 @@
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <Nullable>enable</Nullable>
+    <!-- WinUI 3 still relies on WinForms interop for NotifyIcon and Screen enumeration. -->
     <UseWindowsForms>true</UseWindowsForms>
     <UseWinUI>true</UseWinUI>
     <WindowsPackageType>None</WindowsPackageType>

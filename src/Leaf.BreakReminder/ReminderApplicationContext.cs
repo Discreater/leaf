@@ -75,13 +75,13 @@ internal sealed class ReminderController : IDisposable
     {
         if (Microsoft.UI.Xaml.Application.Current is LeafApplication app)
         {
-            app.Dispose();
-            app.Exit();
-            return;
+            app.RequestExit();
         }
-
-        Dispose();
-        Microsoft.UI.Xaml.Application.Current.Exit();
+        else
+        {
+            Dispose();
+            Microsoft.UI.Xaml.Application.Current.Exit();
+        }
     }
 
     private void ReloadSettings()

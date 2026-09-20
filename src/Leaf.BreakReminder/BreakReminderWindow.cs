@@ -15,10 +15,7 @@ internal sealed class BreakReminderWindow : Window
     private const int WindowWidth = 460;
     private const int WindowHeight = 280;
     private const int GwlStyle = -16;
-    private const int WsThickFrame = 0x00040000;
     private const int WsSysMenu = 0x00080000;
-    private const int WsMinimizeBox = 0x00020000;
-    private const int WsMaximizeBox = 0x00010000;
     private const uint SwpNoSize = 0x0001;
     private const uint SwpNoMove = 0x0002;
     private const uint SwpNoZOrder = 0x0004;
@@ -54,14 +51,17 @@ internal sealed class BreakReminderWindow : Window
         Closed += (_, _) => _isClosed = true;
 
         _windowHandle = WindowNative.GetWindowHandle(this);
+        if (_windowHandle == IntPtr.Zero)
+        {
+            throw new InvalidOperationException("无法创建 WinUI 窗口句柄。");
+        }
+
         ConfigureWindow(screen);
     }
 
     public event EventHandler<int>? PostponeRequested;
 
     public bool IsDisposed => _isClosed;
-
-    public bool IsHandleCreated => _windowHandle != IntPtr.Zero;
 
     public nint Handle => _windowHandle;
 
@@ -166,7 +166,7 @@ internal sealed class BreakReminderWindow : Window
                 workingArea.Top + ((workingArea.Height - WindowHeight) / 2)));
 
         var style = GetWindowLong(_windowHandle, GwlStyle);
-        style &= ~(WsThickFrame | WsSysMenu | WsMinimizeBox | WsMaximizeBox);
+        style &= ~WsSysMenu;
         SetWindowLong(_windowHandle, GwlStyle, style);
         SetWindowPos(_windowHandle, IntPtr.Zero, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoZOrder | SwpFrameChanged);
     }

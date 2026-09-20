@@ -1,13 +1,15 @@
+using Microsoft.UI.Xaml;
+
 namespace Leaf.BreakReminder;
 
-internal sealed class ReminderApplicationContext : ApplicationContext
+internal sealed class ReminderController : IDisposable
 {
     private static readonly int[] PostponeOptionsMinutes = [1, 5, 10, 20];
 
     private readonly ReminderSettingsProvider _settingsProvider;
     private readonly NotifyIcon _notifyIcon;
-    private readonly System.Windows.Forms.Timer _timer;
-    private readonly List<BreakReminderForm> _activeForms = [];
+    private readonly DispatcherTimer _timer;
+    private readonly List<BreakReminderWindow> _activeWindows = [];
     private ReminderSettings _settings;
     private DateTimeOffset _lastBreakEndedAt;
     private DateTimeOffset _nextReminderAt;
@@ -19,8 +21,9 @@ internal sealed class ReminderApplicationContext : ApplicationContext
     private int _activeBreakDurationMinutes;
     private int _activeWorkSessionMinutes;
     private int _totalPostponedMinutes;
+    private bool _disposed;
 
-    public ReminderApplicationContext()
+    public ReminderController()
     {
         var settingsPath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
         _settingsProvider = new ReminderSettingsProvider(settingsPath);
@@ -37,25 +40,26 @@ internal sealed class ReminderApplicationContext : ApplicationContext
             ContextMenuStrip = BuildContextMenu()
         };
 
-        _timer = new System.Windows.Forms.Timer
+        _timer = new DispatcherTimer
         {
-            Interval = 1000
+            Interval = TimeSpan.FromSeconds(1)
         };
         _timer.Tick += (_, _) => OnTick();
         _timer.Start();
     }
 
-    protected override void Dispose(bool disposing)
+    public void Dispose()
     {
-        if (disposing)
+        if (_disposed)
         {
-            _timer.Dispose();
-            CloseActiveForms();
-            _notifyIcon.Visible = false;
-            _notifyIcon.Dispose();
+            return;
         }
 
-        base.Dispose(disposing);
+        _disposed = true;
+        _timer.Stop();
+        CloseActiveWindows();
+        _notifyIcon.Visible = false;
+        _notifyIcon.Dispose();
     }
 
     private ContextMenuStrip BuildContextMenu()
@@ -63,8 +67,14 @@ internal sealed class ReminderApplicationContext : ApplicationContext
         var menu = new ContextMenuStrip();
         menu.Items.Add("重新加载配置", null, (_, _) => ReloadSettings());
         menu.Items.Add("立即提醒", null, (_, _) => QueueImmediateReminder());
-        menu.Items.Add("退出", null, (_, _) => ExitThread());
+        menu.Items.Add("退出", null, (_, _) => ExitApplication());
         return menu;
+    }
+
+    private void ExitApplication()
+    {
+        Dispose();
+        Application.Current.Exit();
     }
 
     private void ReloadSettings()
@@ -107,9 +117,9 @@ internal sealed class ReminderApplicationContext : ApplicationContext
 
     private void UpdateFullscreenState(DateTimeOffset now)
     {
-        var currentWindowHandles = _activeForms
-            .Where(form => form.IsHandleCreated)
-            .Select(form => form.Handle)
+        var currentWindowHandles = _activeWindows
+            .Where(window => !window.IsDisposed && window.IsHandleCreated)
+            .Select(window => window.Handle)
             .ToArray();
 
         var isFullscreen = FullscreenDetector.IsFullscreenForegroundWindow(currentWindowHandles);
@@ -144,14 +154,14 @@ internal sealed class ReminderApplicationContext : ApplicationContext
         _activeBreakDurationMinutes = CalculateBreakDurationMinutes(now);
         _breakEndsAt = now.AddMinutes(_activeBreakDurationMinutes);
 
-        CloseActiveForms();
+        CloseActiveWindows();
 
         foreach (var screen in Screen.AllScreens)
         {
-            var form = new BreakReminderForm(screen, PostponeOptionsMinutes);
-            form.PostponeRequested += (_, minutes) => PostponeReminder(minutes);
-            _activeForms.Add(form);
-            form.Show();
+            var window = new BreakReminderWindow(screen, PostponeOptionsMinutes);
+            window.PostponeRequested += (_, minutes) => PostponeReminder(minutes);
+            _activeWindows.Add(window);
+            window.Activate();
         }
 
         UpdateActiveReminder(now);
@@ -198,16 +208,22 @@ internal sealed class ReminderApplicationContext : ApplicationContext
             return;
         }
 
-        foreach (var form in _activeForms.ToArray())
+        foreach (var window in _activeWindows.ToArray())
         {
-            form.UpdateContent(_activeWorkSessionMinutes, _activeBreakDurationMinutes, remaining);
+            if (window.IsDisposed)
+            {
+                _activeWindows.Remove(window);
+                continue;
+            }
+
+            window.UpdateContent(_activeWorkSessionMinutes, _activeBreakDurationMinutes, remaining);
         }
     }
 
     private void CompleteReminder(DateTimeOffset now)
     {
         _breakEndsAt = null;
-        CloseActiveForms();
+        CloseActiveWindows();
         _totalPostponedMinutes = 0;
         _lastBreakEndedAt = now;
         _nextReminderAt = now.AddMinutes(_settings.WorkIntervalMinutes);
@@ -224,9 +240,9 @@ internal sealed class ReminderApplicationContext : ApplicationContext
         }
 
         _postponeHandled = true;
-        foreach (var form in _activeForms)
+        foreach (var window in _activeWindows.Where(window => !window.IsDisposed))
         {
-            form.SetPostponeButtonsEnabled(false);
+            window.SetPostponeButtonsEnabled(false);
         }
 
         _breakEndsAt = null;
@@ -234,19 +250,19 @@ internal sealed class ReminderApplicationContext : ApplicationContext
         _nextReminderAt = DateTimeOffset.Now.AddMinutes(minutes);
         _reminderPending = false;
         _activeWorkSessionMinutes = 0;
-        CloseActiveForms();
+        CloseActiveWindows();
     }
 
-    private void CloseActiveForms()
+    private void CloseActiveWindows()
     {
-        foreach (var form in _activeForms.ToArray())
+        foreach (var window in _activeWindows.ToArray())
         {
-            if (!form.IsDisposed)
+            if (!window.IsDisposed)
             {
-                form.Close();
+                window.Close();
             }
         }
 
-        _activeForms.Clear();
+        _activeWindows.Clear();
     }
 }

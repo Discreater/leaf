@@ -1,11 +1,33 @@
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using WinRT;
+using XamlApplication = Microsoft.UI.Xaml.Application;
+
 namespace Leaf.BreakReminder;
 
-static class Program
+internal static class Program
 {
     [STAThread]
-    static void Main()
+    private static void Main()
     {
-        ApplicationConfiguration.Initialize();
-        Application.Run(new ReminderApplicationContext());
-    }    
+        ComWrappersSupport.InitializeComWrappers();
+        XamlCheckProcessRequirements();
+
+        XamlApplication.Start(_ =>
+        {
+            var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
+            SynchronizationContext.SetSynchronizationContext(context);
+            _ = new LeafApplication();
+        });
+    }
+}
+
+internal sealed class LeafApplication : XamlApplication
+{
+    private ReminderController? _controller;
+
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    {
+        _controller = new ReminderController();
+    }
 }

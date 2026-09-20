@@ -15,7 +15,9 @@ internal sealed class ReminderApplicationContext : ApplicationContext
     private DateTimeOffset? _breakEndsAt;
     private bool _reminderPending;
     private bool _wasFullscreen;
+    private bool _reminderActionInProgress;
     private int _activeBreakDurationMinutes;
+    private int _activeWorkSessionMinutes;
     private int _totalPostponedMinutes;
 
     public ReminderApplicationContext()
@@ -137,6 +139,8 @@ internal sealed class ReminderApplicationContext : ApplicationContext
     private void ShowReminder(DateTimeOffset now)
     {
         _reminderPending = false;
+        _reminderActionInProgress = false;
+        _activeWorkSessionMinutes = GetElapsedWorkMinutes(now);
         _activeBreakDurationMinutes = CalculateBreakDurationMinutes(now);
         _breakEndsAt = now.AddMinutes(_activeBreakDurationMinutes);
 
@@ -194,35 +198,40 @@ internal sealed class ReminderApplicationContext : ApplicationContext
             return;
         }
 
-        var elapsedWorkMinutes = GetElapsedWorkMinutes(now);
         foreach (var form in _activeForms.ToArray())
         {
-            form.UpdateContent(elapsedWorkMinutes, _activeBreakDurationMinutes, remaining);
+            form.UpdateContent(_activeWorkSessionMinutes, _activeBreakDurationMinutes, remaining);
         }
     }
 
     private void CompleteReminder(DateTimeOffset now)
     {
+        _reminderActionInProgress = true;
         _breakEndsAt = null;
         CloseActiveForms();
         _totalPostponedMinutes = 0;
         _lastBreakEndedAt = now;
         _nextReminderAt = now.AddMinutes(_settings.WorkIntervalMinutes);
         _reminderPending = false;
+        _activeWorkSessionMinutes = 0;
+        _reminderActionInProgress = false;
     }
 
     private void PostponeReminder(int minutes)
     {
-        if (_breakEndsAt is null)
+        if (_breakEndsAt is null || _reminderActionInProgress)
         {
             return;
         }
 
+        _reminderActionInProgress = true;
         _breakEndsAt = null;
         _totalPostponedMinutes += minutes;
         _nextReminderAt = DateTimeOffset.Now.AddMinutes(minutes);
         _reminderPending = false;
+        _activeWorkSessionMinutes = 0;
         CloseActiveForms();
+        _reminderActionInProgress = false;
     }
 
     private void CloseActiveForms()

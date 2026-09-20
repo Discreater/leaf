@@ -166,16 +166,16 @@ internal sealed class BreakReminderWindow : Window
                 workingArea.Top + ((workingArea.Height - WindowHeight) / 2)));
 
         Marshal.SetLastPInvokeError(0);
-        var style = GetWindowLong(_windowHandle, GwlStyle);
-        if (style == 0 && Marshal.GetLastPInvokeError() != 0)
+        var style = GetWindowLongPtr(_windowHandle, GwlStyle);
+        if (style == IntPtr.Zero && Marshal.GetLastPInvokeError() != 0)
         {
             return;
         }
 
-        style &= ~WsSysMenu;
+        var updatedStyle = new IntPtr(style.ToInt64() & ~WsSysMenu);
         Marshal.SetLastPInvokeError(0);
-        var previousStyle = SetWindowLong(_windowHandle, GwlStyle, style);
-        if (previousStyle == 0 && Marshal.GetLastPInvokeError() != 0)
+        var previousStyle = SetWindowLongPtr(_windowHandle, GwlStyle, updatedStyle);
+        if (previousStyle == IntPtr.Zero && Marshal.GetLastPInvokeError() != 0)
         {
             return;
         }
@@ -184,10 +184,10 @@ internal sealed class BreakReminderWindow : Window
     }
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern int GetWindowLong(nint hWnd, int nIndex);
+    private static extern nint GetWindowLongPtr(nint hWnd, int nIndex);
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern int SetWindowLong(nint hWnd, int nIndex, int dwNewLong);
+    private static extern nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

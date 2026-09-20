@@ -124,6 +124,8 @@ internal sealed class ReminderController : IDisposable
 
     private void UpdateFullscreenState(DateTimeOffset now)
     {
+        PruneClosedWindows();
+
         var currentWindowHandles = _activeWindows
             .Select(window => window.Handle)
             .Where(handle => handle != IntPtr.Zero)
@@ -208,6 +210,8 @@ internal sealed class ReminderController : IDisposable
             return;
         }
 
+        PruneClosedWindows();
+
         var remaining = _breakEndsAt.Value - now;
         if (remaining <= TimeSpan.Zero)
         {
@@ -215,14 +219,8 @@ internal sealed class ReminderController : IDisposable
             return;
         }
 
-        foreach (var window in _activeWindows.ToArray())
+        foreach (var window in _activeWindows)
         {
-            if (window.IsDisposed)
-            {
-                _activeWindows.Remove(window);
-                continue;
-            }
-
             window.UpdateContent(_activeWorkSessionMinutes, _activeBreakDurationMinutes, remaining);
         }
     }
@@ -246,8 +244,9 @@ internal sealed class ReminderController : IDisposable
             return;
         }
 
+        PruneClosedWindows();
         _postponeHandled = true;
-        foreach (var window in _activeWindows.Where(window => !window.IsDisposed))
+        foreach (var window in _activeWindows)
         {
             window.SetPostponeButtonsEnabled(false);
         }
@@ -262,6 +261,8 @@ internal sealed class ReminderController : IDisposable
 
     private void CloseActiveWindows()
     {
+        PruneClosedWindows();
+
         foreach (var window in _activeWindows.ToArray())
         {
             if (!window.IsDisposed)
@@ -271,5 +272,10 @@ internal sealed class ReminderController : IDisposable
         }
 
         _activeWindows.Clear();
+    }
+
+    private void PruneClosedWindows()
+    {
+        _activeWindows.RemoveAll(window => window.IsDisposed);
     }
 }

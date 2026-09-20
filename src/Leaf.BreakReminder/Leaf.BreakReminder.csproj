@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <!-- Windows App SDK build support remains pinned to .NET 8 for this project. -->
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <Nullable>enable</Nullable>

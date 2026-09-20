@@ -171,7 +171,7 @@ internal sealed class ReminderApplicationContext : ApplicationContext
 
     private int GetElapsedWorkMinutes(DateTimeOffset now)
     {
-        return Math.Max(1, (int)Math.Ceiling((now - _lastBreakEndedAt).TotalMinutes));
+        return Math.Max(0, (int)Math.Ceiling((now - _lastBreakEndedAt).TotalMinutes));
     }
 
     private static int CalculateCeilingBlocks(int totalMinutes, int blockMinutes)
@@ -206,7 +206,6 @@ internal sealed class ReminderApplicationContext : ApplicationContext
 
     private void CompleteReminder(DateTimeOffset now)
     {
-        _reminderActionInProgress = true;
         _breakEndsAt = null;
         CloseActiveForms();
         _totalPostponedMinutes = 0;
@@ -214,7 +213,6 @@ internal sealed class ReminderApplicationContext : ApplicationContext
         _nextReminderAt = now.AddMinutes(_settings.WorkIntervalMinutes);
         _reminderPending = false;
         _activeWorkSessionMinutes = 0;
-        _reminderActionInProgress = false;
     }
 
     private void PostponeReminder(int minutes)

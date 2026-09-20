@@ -21,12 +21,25 @@ internal static class Program
     }
 }
 
-internal sealed class LeafApplication : XamlApplication
+internal sealed class LeafApplication : XamlApplication, IDisposable
 {
     private ReminderController? _controller;
+    private bool _disposed;
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         _controller = new ReminderController();
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _controller?.Dispose();
+        _controller = null;
     }
 }

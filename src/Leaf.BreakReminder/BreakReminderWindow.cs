@@ -45,7 +45,7 @@ internal sealed class BreakReminderWindow : Window
         _countdownTextBlock = new TextBlock
         {
             FontSize = 32,
-            FontWeight = Windows.UI.Text.FontWeights.Bold,
+            FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             TextAlignment = TextAlignment.Center,
             Margin = new Thickness(0, 20, 0, 0)
         };
@@ -87,7 +87,7 @@ internal sealed class BreakReminderWindow : Window
         {
             Text = "该休息了",
             FontSize = 30,
-            FontWeight = Windows.UI.Text.FontWeights.SemiBold,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             TextAlignment = TextAlignment.Center
         };
 
@@ -102,8 +102,8 @@ internal sealed class BreakReminderWindow : Window
 
         var buttonsPanel = new StackPanel
         {
-            Orientation = Orientation.Horizontal,
-            HorizontalAlignment = HorizontalAlignment.Center,
+            Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal,
+            HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Center,
             Spacing = 12,
             Margin = new Thickness(0, 28, 0, 0)
         };
@@ -147,7 +147,7 @@ internal sealed class BreakReminderWindow : Window
 
     private void ConfigureWindow(Screen screen)
     {
-        var appWindow = AppWindow.GetFromWindowId(Win32Interop.GetWindowIdFromWindow(_windowHandle));
+        var appWindow = AppWindow.GetFromWindowId(Microsoft.UI.Win32Interop.GetWindowIdFromWindow(_windowHandle));
         appWindow.Resize(new SizeInt32(WindowWidth, WindowHeight));
         appWindow.IsShownInSwitchers = false;
 

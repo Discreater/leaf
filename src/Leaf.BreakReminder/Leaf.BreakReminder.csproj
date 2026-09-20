@@ -10,6 +10,8 @@
     <WindowsPackageType>None</WindowsPackageType>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <EnableCoreMrtTooling Condition="'$(OS)' != 'Windows_NT'">false</EnableCoreMrtTooling>
+    <EnablePriGenTooling Condition="'$(OS)' != 'Windows_NT'">false</EnablePriGenTooling>
   </PropertyGroup>
 
   <ItemGroup>

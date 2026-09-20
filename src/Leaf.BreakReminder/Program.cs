@@ -11,13 +11,12 @@ internal static class Program
     private static void Main()
     {
         ComWrappersSupport.InitializeComWrappers();
-        XamlCheckProcessRequirements();
 
         XamlApplication.Start(_ =>
         {
             var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
             SynchronizationContext.SetSynchronizationContext(context);
-            _ = new LeafApplication();
+            new LeafApplication();
         });
     }
 }

@@ -74,7 +74,7 @@ internal sealed class ReminderController : IDisposable
     private void ExitApplication()
     {
         Dispose();
-        Application.Current.Exit();
+        Microsoft.UI.Xaml.Application.Current.Exit();
     }
 
     private void ReloadSettings()

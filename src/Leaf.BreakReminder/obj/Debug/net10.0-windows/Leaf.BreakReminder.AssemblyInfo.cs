@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Leaf.BreakReminder")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b560b51141f53343bb5ad909fa71c4cc5d3f9f0e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ded9b6b805959e068d5111f814d2925eb5f1fc7e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Leaf.BreakReminder")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Leaf.BreakReminder")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

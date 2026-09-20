@@ -8,6 +8,8 @@ internal sealed class BreakReminderForm : Form
 
     public BreakReminderForm(Screen screen, IReadOnlyList<int> postponeOptionsMinutes)
     {
+        var baseFont = SystemFonts.MessageBoxFont ?? DefaultFont;
+
         StartPosition = FormStartPosition.Manual;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
@@ -24,7 +26,7 @@ internal sealed class BreakReminderForm : Form
         {
             Dock = DockStyle.Top,
             Height = 60,
-            Font = new Font(SystemFonts.MessageBoxFont.FontFamily, 22, FontStyle.Bold),
+            Font = new Font(baseFont.FontFamily, 22, FontStyle.Bold),
             TextAlign = ContentAlignment.MiddleCenter,
             Text = "该休息了"
         };
@@ -33,7 +35,7 @@ internal sealed class BreakReminderForm : Form
         {
             Dock = DockStyle.Top,
             Height = 40,
-            Font = new Font(SystemFonts.MessageBoxFont.FontFamily, 11, FontStyle.Regular),
+            Font = new Font(baseFont.FontFamily, 11, FontStyle.Regular),
             TextAlign = ContentAlignment.MiddleCenter
         };
 
@@ -41,7 +43,7 @@ internal sealed class BreakReminderForm : Form
         {
             Dock = DockStyle.Top,
             Height = 72,
-            Font = new Font(SystemFonts.MessageBoxFont.FontFamily, 26, FontStyle.Bold),
+            Font = new Font(baseFont.FontFamily, 26, FontStyle.Bold),
             TextAlign = ContentAlignment.MiddleCenter
         };
 
@@ -49,7 +51,7 @@ internal sealed class BreakReminderForm : Form
         {
             Dock = DockStyle.Top,
             Height = 40,
-            Font = new Font(SystemFonts.MessageBoxFont.FontFamily, 10, FontStyle.Regular),
+            Font = new Font(baseFont.FontFamily, 10, FontStyle.Regular),
             TextAlign = ContentAlignment.MiddleCenter,
             Text = "倒计时结束后窗口会自动关闭"
         };
@@ -90,7 +92,9 @@ internal sealed class BreakReminderForm : Form
     public void UpdateContent(int elapsedWorkMinutes, int breakDurationMinutes, TimeSpan remaining)
     {
         _summaryLabel.Text = $"你已经连续工作 {elapsedWorkMinutes} 分钟，本次建议休息 {breakDurationMinutes} 分钟。";
-        _countdownLabel.Text = remaining.ToString(@"mm\:ss");
+        _countdownLabel.Text = remaining.TotalHours >= 1
+            ? $"{(int)remaining.TotalHours:00}:{remaining.Minutes:00}:{remaining.Seconds:00}"
+            : $"{(int)remaining.TotalMinutes:00}:{remaining.Seconds:00}";
     }
 
     private void CenterOnScreen(Screen screen)

@@ -14,7 +14,7 @@
 ## 运行
 
 ```bash
-dotnet build /home/runner/work/leaf/leaf/leaf.slnx
+dotnet build leaf.slnx
 ```
 
 程序输出目录中的 `appsettings.json` 可用于调整提醒参数：

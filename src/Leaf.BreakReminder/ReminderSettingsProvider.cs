@@ -4,9 +4,13 @@ namespace Leaf.BreakReminder;
 
 internal sealed class ReminderSettingsProvider
 {
-    private static readonly JsonSerializerOptions SerializerOptions = new()
+    private static readonly JsonSerializerOptions ReadOptions = new()
     {
-        PropertyNameCaseInsensitive = true,
+        PropertyNameCaseInsensitive = true
+    };
+
+    private static readonly JsonSerializerOptions WriteOptions = new()
+    {
         WriteIndented = true
     };
 
@@ -27,7 +31,7 @@ internal sealed class ReminderSettingsProvider
         }
 
         var raw = File.ReadAllText(_settingsPath);
-        var settings = JsonSerializer.Deserialize<ReminderSettings>(raw, SerializerOptions) ?? new ReminderSettings();
+        var settings = JsonSerializer.Deserialize<ReminderSettings>(raw, ReadOptions) ?? new ReminderSettings();
         settings = Normalize(settings);
         Save(settings);
         return settings;
@@ -36,7 +40,7 @@ internal sealed class ReminderSettingsProvider
     private void Save(ReminderSettings settings)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(_settingsPath)!);
-        File.WriteAllText(_settingsPath, JsonSerializer.Serialize(settings, SerializerOptions));
+        File.WriteAllText(_settingsPath, JsonSerializer.Serialize(settings, WriteOptions));
     }
 
     private static ReminderSettings Normalize(ReminderSettings settings)

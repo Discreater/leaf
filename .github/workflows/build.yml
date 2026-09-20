@@ -31,6 +31,7 @@ jobs:
           -r win-x64
           --self-contained true
           -p:PublishSingleFile=true
+          -p:EnableMsixTooling=true
           -p:IncludeNativeLibrariesForSelfExtract=true
           -o publish
 

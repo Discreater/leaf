@@ -2,7 +2,12 @@ namespace Leaf.BreakReminder;
 
 internal sealed class BreakReminderForm : Form
 {
+    private readonly Font _titleFont;
+    private readonly Font _summaryFont;
+    private readonly Font _countdownFont;
+    private readonly Font _detailFont;
     private readonly List<Button> _postponeButtons = [];
+    private readonly Label _titleLabel;
     private readonly Label _summaryLabel;
     private readonly Label _countdownLabel;
     private readonly Label _detailLabel;
@@ -22,16 +27,16 @@ internal sealed class BreakReminderForm : Form
         Text = "休息提醒";
         ClientSize = new Size(460, 280);
         BackColor = SystemColors.Control;
-        var titleFont = new Font(baseFont.FontFamily, 22, FontStyle.Bold);
-        var summaryFont = new Font(baseFont.FontFamily, 11, FontStyle.Regular);
-        var countdownFont = new Font(baseFont.FontFamily, 26, FontStyle.Bold);
-        var detailFont = new Font(baseFont.FontFamily, 10, FontStyle.Regular);
+        _titleFont = new Font(baseFont.FontFamily, 22, FontStyle.Bold);
+        _summaryFont = new Font(baseFont.FontFamily, 11, FontStyle.Regular);
+        _countdownFont = new Font(baseFont.FontFamily, 26, FontStyle.Bold);
+        _detailFont = new Font(baseFont.FontFamily, 10, FontStyle.Regular);
 
-        var titleLabel = new Label
+        _titleLabel = new Label
         {
             Dock = DockStyle.Top,
             Height = 60,
-            Font = titleFont,
+            Font = _titleFont,
             TextAlign = ContentAlignment.MiddleCenter,
             Text = "该休息了"
         };
@@ -40,7 +45,7 @@ internal sealed class BreakReminderForm : Form
         {
             Dock = DockStyle.Top,
             Height = 40,
-            Font = summaryFont,
+            Font = _summaryFont,
             TextAlign = ContentAlignment.MiddleCenter
         };
 
@@ -48,7 +53,7 @@ internal sealed class BreakReminderForm : Form
         {
             Dock = DockStyle.Top,
             Height = 72,
-            Font = countdownFont,
+            Font = _countdownFont,
             TextAlign = ContentAlignment.MiddleCenter
         };
 
@@ -56,7 +61,7 @@ internal sealed class BreakReminderForm : Form
         {
             Dock = DockStyle.Top,
             Height = 40,
-            Font = detailFont,
+            Font = _detailFont,
             TextAlign = ContentAlignment.MiddleCenter,
             Text = "倒计时结束后窗口会自动关闭"
         };
@@ -88,7 +93,7 @@ internal sealed class BreakReminderForm : Form
         Controls.Add(_detailLabel);
         Controls.Add(_countdownLabel);
         Controls.Add(_summaryLabel);
-        Controls.Add(titleLabel);
+        Controls.Add(_titleLabel);
 
         CenterOnScreen(screen);
     }
@@ -109,6 +114,24 @@ internal sealed class BreakReminderForm : Form
         {
             button.Enabled = enabled;
         }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _titleLabel.Font = DefaultFont;
+            _summaryLabel.Font = DefaultFont;
+            _countdownLabel.Font = DefaultFont;
+            _detailLabel.Font = DefaultFont;
+
+            _titleFont.Dispose();
+            _summaryFont.Dispose();
+            _countdownFont.Dispose();
+            _detailFont.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 
     private void CenterOnScreen(Screen screen)

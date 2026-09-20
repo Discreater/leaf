@@ -32,9 +32,9 @@ internal sealed class ReminderSettingsProvider
 
         var raw = File.ReadAllText(_settingsPath);
         var settings = JsonSerializer.Deserialize<ReminderSettings>(raw, ReadOptions) ?? new ReminderSettings();
-        var originalSnapshot = JsonSerializer.Serialize(settings);
+        var originalSnapshot = JsonSerializer.Serialize(settings, WriteOptions);
         var normalized = Normalize(settings);
-        var normalizedSnapshot = JsonSerializer.Serialize(normalized);
+        var normalizedSnapshot = JsonSerializer.Serialize(normalized, WriteOptions);
 
         if (!string.Equals(originalSnapshot, normalizedSnapshot, StringComparison.Ordinal))
         {

@@ -52,13 +52,15 @@ internal sealed class ReminderSettingsProvider
 
     private static ReminderSettings Normalize(ReminderSettings settings)
     {
-        settings.WorkIntervalMinutes = Math.Max(1, settings.WorkIntervalMinutes);
-        settings.BaseBreakDurationMinutes = Math.Max(1, settings.BaseBreakDurationMinutes);
-        settings.FullscreenCooldownMinutes = Math.Max(0, settings.FullscreenCooldownMinutes);
-        settings.OvertimeBlockMinutes = Math.Max(1, settings.OvertimeBlockMinutes);
-        settings.BreakDurationExtensionPerOvertimeBlockMinutes = Math.Max(0, settings.BreakDurationExtensionPerOvertimeBlockMinutes);
-        settings.PostponeBlockMinutes = Math.Max(1, settings.PostponeBlockMinutes);
-        settings.BreakDurationExtensionPerPostponeBlockMinutes = Math.Max(0, settings.BreakDurationExtensionPerPostponeBlockMinutes);
-        return settings;
+        return new ReminderSettings
+        {
+            WorkIntervalMinutes = Math.Max(1, settings.WorkIntervalMinutes),
+            BaseBreakDurationMinutes = Math.Max(1, settings.BaseBreakDurationMinutes),
+            FullscreenCooldownMinutes = Math.Max(0, settings.FullscreenCooldownMinutes),
+            OvertimeBlockMinutes = Math.Max(1, settings.OvertimeBlockMinutes),
+            BreakDurationExtensionPerOvertimeBlockMinutes = Math.Max(0, settings.BreakDurationExtensionPerOvertimeBlockMinutes),
+            PostponeBlockMinutes = Math.Max(1, settings.PostponeBlockMinutes),
+            BreakDurationExtensionPerPostponeBlockMinutes = Math.Max(0, settings.BreakDurationExtensionPerPostponeBlockMinutes)
+        };
     }
 }

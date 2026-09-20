@@ -15,7 +15,6 @@ internal sealed class ReminderApplicationContext : ApplicationContext
     private DateTimeOffset? _breakEndsAt;
     private bool _reminderPending;
     private bool _wasFullscreen;
-    private bool _reminderActionInProgress;
     private int _activeBreakDurationMinutes;
     private int _activeWorkSessionMinutes;
     private int _totalPostponedMinutes;
@@ -139,7 +138,6 @@ internal sealed class ReminderApplicationContext : ApplicationContext
     private void ShowReminder(DateTimeOffset now)
     {
         _reminderPending = false;
-        _reminderActionInProgress = false;
         _activeWorkSessionMinutes = GetElapsedWorkMinutes(now);
         _activeBreakDurationMinutes = CalculateBreakDurationMinutes(now);
         _breakEndsAt = now.AddMinutes(_activeBreakDurationMinutes);
@@ -217,19 +215,22 @@ internal sealed class ReminderApplicationContext : ApplicationContext
 
     private void PostponeReminder(int minutes)
     {
-        if (_breakEndsAt is null || _reminderActionInProgress)
+        if (_breakEndsAt is null)
         {
             return;
         }
 
-        _reminderActionInProgress = true;
+        foreach (var form in _activeForms)
+        {
+            form.SetPostponeButtonsEnabled(false);
+        }
+
         _breakEndsAt = null;
         _totalPostponedMinutes += minutes;
         _nextReminderAt = DateTimeOffset.Now.AddMinutes(minutes);
         _reminderPending = false;
         _activeWorkSessionMinutes = 0;
         CloseActiveForms();
-        _reminderActionInProgress = false;
     }
 
     private void CloseActiveForms()

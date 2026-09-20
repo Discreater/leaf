@@ -146,7 +146,6 @@ internal sealed class ReminderApplicationContext : ApplicationContext
         {
             var form = new BreakReminderForm(screen, PostponeOptionsMinutes);
             form.PostponeRequested += (_, minutes) => PostponeReminder(minutes);
-            form.FormClosed += (_, _) => _activeForms.Remove(form);
             _activeForms.Add(form);
             form.Show();
         }

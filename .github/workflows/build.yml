@@ -29,10 +29,8 @@ jobs:
           dotnet publish src/Leaf.BreakReminder/Leaf.BreakReminder.csproj
           -c Release
           -r win-x64
-          --self-contained true
+          --self-contained false
           -p:PublishSingleFile=true
-          -p:EnableMsixTooling=true
-          -p:IncludeNativeLibrariesForSelfExtract=true
           -o publish
 
       - name: Upload build artifact

@@ -35,10 +35,13 @@ jobs:
           -o publish
 
       - name: Copy Windows App Runtime Redistributable from NuGet cache
-        run: >
+        run: |
           $sdk = Get-ChildItem "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk" |
-          Sort-Object Name -Descending | Select-Object -First 1;
-          Copy-Item "$($sdk.FullName)\tools\*\WindowsAppRuntimeInstall-x64.exe" publish\WindowsAppRuntimeInstall-x64.exe
+            Sort-Object Name -Descending | Select-Object -First 1
+          $installer = Get-ChildItem -Recurse -Path $sdk.FullName -Filter "WindowsAppRuntimeInstall-x64.exe" |
+            Select-Object -First 1
+          if (-not $installer) { throw "WindowsAppRuntimeInstall-x64.exe not found in NuGet cache" }
+          Copy-Item $installer.FullName publish\WindowsAppRuntimeInstall-x64.exe
         shell: pwsh
 
       - name: Upload build artifact

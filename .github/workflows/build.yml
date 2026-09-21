@@ -34,11 +34,11 @@ jobs:
           -p:EnableMsixTooling=true
           -o publish
 
-      - name: Download Windows App Runtime Redistributable
+      - name: Copy Windows App Runtime Redistributable from NuGet cache
         run: >
-          Invoke-WebRequest -Uri
-          "https://github.com/microsoft/WindowsAppSDK/releases/download/v1.6.250108002/WindowsAppRuntimeInstall-x64.exe"
-          -OutFile publish/WindowsAppRuntimeInstall-x64.exe
+          $sdk = Get-ChildItem "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk" |
+          Sort-Object Name -Descending | Select-Object -First 1;
+          Copy-Item "$($sdk.FullName)\tools\*\WindowsAppRuntimeInstall-x64.exe" publish\WindowsAppRuntimeInstall-x64.exe
         shell: pwsh
 
       - name: Upload build artifact

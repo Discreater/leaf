@@ -37,7 +37,7 @@ jobs:
       - name: Download Windows App Runtime Redistributable
         run: >
           Invoke-WebRequest -Uri
-          "https://aka.ms/windowsappruntimeinstall-x64"
+          "https://github.com/microsoft/WindowsAppSDK/releases/download/v1.6.250108002/WindowsAppRuntimeInstall-x64.exe"
           -OutFile publish/WindowsAppRuntimeInstall-x64.exe
         shell: pwsh
 

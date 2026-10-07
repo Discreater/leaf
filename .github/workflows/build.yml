@@ -43,7 +43,7 @@ jobs:
           $major, $minor = $version.Split('.')[0..1]
           $prefix = "v$major.$minor"
           $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; "X-GitHub-Api-Version" = "2022-11-28" }
-          $releases = Invoke-RestMethod "https://api.github.com/repos/microsoft/WindowsAppSDK/releases" -Headers $headers
+          $releases = Invoke-RestMethod "https://api.github.com/repos/microsoft/WindowsAppSDK/releases?per_page=100" -Headers $headers
           $tag = ($releases | Where-Object { $_.tag_name -like "$prefix.*" } | Select-Object -First 1).tag_name
           if (-not $tag) { $tag = $prefix }
           $url = "https://github.com/microsoft/WindowsAppSDK/releases/download/$tag/WindowsAppRuntimeInstall-x64.exe"

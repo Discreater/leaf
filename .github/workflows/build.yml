@@ -34,12 +34,18 @@ jobs:
           -p:EnableMsixTooling=true
           -o publish
 
-      - name: Copy Windows App Runtime Redistributable from NuGet cache
+      - name: Download Windows App Runtime Redistributable
         run: |
-          $installer = Get-ChildItem -Recurse -Path "$env:USERPROFILE\.nuget\packages" -Filter "WindowsAppRuntimeInstall-x64.exe" |
-            Select-Object -First 1
-          if (-not $installer) { throw "WindowsAppRuntimeInstall-x64.exe not found in NuGet cache" }
-          Copy-Item $installer.FullName publish\WindowsAppRuntimeInstall-x64.exe
+          $version = (Select-Xml -Path src/Leaf.BreakReminder/Leaf.BreakReminder.csproj `
+            -XPath "//PackageReference[@Include='Microsoft.WindowsAppSDK']/@Version").Node.Value
+          $major, $minor = $version.Split('.')[0..1]
+          $prefix = "v$major.$minor"
+          $releases = Invoke-RestMethod "https://api.github.com/repos/microsoft/WindowsAppSDK/releases"
+          $tag = ($releases | Where-Object { $_.tag_name -like "$prefix.*" } | Select-Object -First 1).tag_name
+          if (-not $tag) { $tag = $prefix }
+          $url = "https://github.com/microsoft/WindowsAppSDK/releases/download/$tag/WindowsAppRuntimeInstall-x64.exe"
+          Write-Host "Downloading $url"
+          Invoke-WebRequest -Uri $url -OutFile publish\WindowsAppRuntimeInstall-x64.exe
         shell: pwsh
 
       - name: Upload build artifact

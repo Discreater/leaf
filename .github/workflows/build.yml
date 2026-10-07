@@ -36,9 +36,9 @@ jobs:
 
       - name: Copy Windows App Runtime Redistributable from NuGet cache
         run: |
-          $sdk = Get-ChildItem "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk" |
+          $redist = Get-ChildItem "$env:USERPROFILE\.nuget\packages\microsoft.windowsappruntime.redist.x64" |
             Sort-Object Name -Descending | Select-Object -First 1
-          $installer = Get-ChildItem -Recurse -Path $sdk.FullName -Filter "WindowsAppRuntimeInstall-x64.exe" |
+          $installer = Get-ChildItem -Recurse -Path $redist.FullName -Filter "WindowsAppRuntimeInstall-x64.exe" |
             Select-Object -First 1
           if (-not $installer) { throw "WindowsAppRuntimeInstall-x64.exe not found in NuGet cache" }
           Copy-Item $installer.FullName publish\WindowsAppRuntimeInstall-x64.exe

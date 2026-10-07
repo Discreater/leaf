@@ -35,14 +35,10 @@ jobs:
           -o publish
 
       - name: Download Windows App Runtime Redistributable
-        run: |
-          nuget install Microsoft.WindowsAppRuntime.Redist.x64 `
-            -OutputDirectory "$env:TEMP\wasdk-redist" `
-            -NonInteractive
-          $installer = Get-ChildItem -Recurse "$env:TEMP\wasdk-redist" `
-            -Filter "WindowsAppRuntimeInstall-x64.exe" | Select-Object -First 1
-          if (-not $installer) { throw "WindowsAppRuntimeInstall-x64.exe not found in Microsoft.WindowsAppRuntime.Redist.x64" }
-          Copy-Item $installer.FullName publish\WindowsAppRuntimeInstall-x64.exe
+        run: >
+          Invoke-WebRequest
+          -Uri "https://aka.ms/windowsappsdk/1.6/latest/windowsappruntimeinstall-x64.exe"
+          -OutFile publish\WindowsAppRuntimeInstall-x64.exe
         shell: pwsh
 
       - name: Upload build artifact

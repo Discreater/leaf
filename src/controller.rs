@@ -94,12 +94,14 @@ fn state() -> Signal<State> {
 /// and the one-second tick. Called once by the root component.
 pub fn start() {
     set_application_menu(application_menu());
+    hide_to_tray_on_close();
 
     effect(move || {
         if is_reminder() {
             // The reminder floats above normal windows (macOS / Windows);
             // focus also raises it on Linux, where window levels are a
-            // no-op in nsh's GTK backend.
+            // no-op in nsh's GTK backend, and shows it again when the user
+            // had closed it to the tray.
             set_window_level(WindowLevel::Floating);
             main_window().focus();
         } else {
@@ -108,6 +110,15 @@ pub fn start() {
     });
 
     set_interval(Duration::from_secs(1), tick);
+}
+
+/// Closing the window hides it to the system tray instead of quitting the
+/// app; the tray menu's "退出" (or the application menu's) still quits.
+fn hide_to_tray_on_close() {
+    let mut attributes = WindowAttributes::default();
+    attributes.close_on_press = Some(false);
+    main_window().set(attributes);
+    main_window().on_close_press(|_| main_window().hide());
 }
 
 fn set_window_level(level: WindowLevel) {

@@ -39,6 +39,18 @@ jobs:
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
 
+      - name: Install nsh CLI (nightly, for the TSX tray)
+        if: runner.os == 'Linux'
+        run: |
+          curl -fsSL https://nsh.dev/install.sh | sh -s -- --nightly
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Check and build the app (Rust + TSX)
+        if: runner.os == 'Linux'
+        run: |
+          nsh check
+          nsh build
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:

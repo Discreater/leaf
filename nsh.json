@@ -3,6 +3,5 @@
   "id": "dev.leaf.breakreminder",
   "version": "1.0.0",
   "appearance": "system",
-  "rust": ".",
-  "root": "App"
+  "rust": "."
 }

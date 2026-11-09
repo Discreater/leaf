@@ -15,6 +15,28 @@ use nsh_core::{
 
 use crate::settings::{ReminderSettings, SettingsProvider};
 
+/// Rust functions the TSX tray menu calls (`leaf/native`).
+#[module]
+pub struct Controller;
+
+#[module]
+impl Controller {
+    /// Reloads `appsettings.json` and reschedules the next reminder.
+    pub fn reload_settings() {
+        reload_settings();
+    }
+
+    /// Shows the reminder now.
+    pub fn remind_now() {
+        remind_now();
+    }
+
+    /// Quits the app, tray icon included.
+    pub fn quit() {
+        quit();
+    }
+}
+
 /// The postpone choices offered on the reminder window, in minutes.
 pub const POSTPONE_OPTIONS_MINUTES: [u32; 4] = [1, 5, 10, 20];
 

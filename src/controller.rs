@@ -5,10 +5,9 @@
 use std::time::{Duration, Instant};
 
 use nsh_core::{
-    desktop::WindowLevel,
+    desktop::{WindowAttributes, WindowLevel},
     element::desktop::{
-        close_window, order_front, popup_menu_at, set_application_menu, set_level, set_title,
-        MenuItem,
+        main_window, popup_menu_at, quit, set_application_menu, MenuItem,
     },
     geometry::{Point, Points},
     prelude::*,
@@ -72,22 +71,27 @@ fn state() -> Signal<State> {
 /// Starts the controller: the application menu, the floating-window effect
 /// and the one-second tick. Called once by the root component.
 pub fn start() {
-    set_title("Leaf 休息提醒");
     set_application_menu(application_menu());
 
     effect(move || {
         if is_reminder() {
             // The reminder floats above normal windows (macOS / Windows);
-            // order_front also raises it on Linux, where window levels are
-            // a no-op in nsh's GTK backend.
-            set_level(WindowLevel::Floating);
-            order_front();
+            // focus also raises it on Linux, where window levels are a
+            // no-op in nsh's GTK backend.
+            set_window_level(WindowLevel::Floating);
+            main_window().focus();
         } else {
-            set_level(WindowLevel::Normal);
+            set_window_level(WindowLevel::Normal);
         }
     });
 
     set_interval(Duration::from_secs(1), tick);
+}
+
+fn set_window_level(level: WindowLevel) {
+    let mut attributes = WindowAttributes::default();
+    attributes.level = Some(level);
+    main_window().set(attributes);
 }
 
 /// The menu shown as the application menu and as the window's context menu.
@@ -96,7 +100,7 @@ pub fn application_menu() -> Vec<MenuItem> {
         MenuItem::new("重新加载配置").on_select(reload_settings),
         MenuItem::new("立即提醒").on_select(remind_now),
         MenuItem::separator(),
-        MenuItem::new("退出").on_select(close_window),
+        MenuItem::new("退出").on_select(quit),
     ]
 }
 

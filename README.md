@@ -25,14 +25,22 @@ WinUI 3 版本保持一致；UI 与状态机在 Rust 中实现，托盘图标通
 需要 [Rust](https://rustup.rs)（1.85+）、[nsh CLI](https://nsh.dev/docs/installation)
 以及各平台依赖：
 
-- **Linux**：GTK 4.14+（`libgtk-4-dev`、`libpango1.0-dev`、`libcairo2-dev`）以及
-  GStreamer（`libgstreamer1.0-dev`、`libgstreamer-plugins-base1.0-dev`）。
+- **Linux**：GTK 4.14+（`libgtk-4-dev`、`libpango1.0-dev`、`libcairo2-dev`）、
+  GStreamer（`libgstreamer1.0-dev`、`libgstreamer-plugins-base1.0-dev`）以及
+  WebKitGTK 6.0（`libwebkitgtk-6.0-dev`；`nsh run` / `nsh package` 的 Linux
+  宿主/运行器默认开启 `webview`，即使本应用不用 web 视图也需要它）。
 - **macOS**：Xcode Command Line Tools。
 - **Windows**：Visual Studio Build Tools（MSVC）或 MinGW-w64。
 
 ```bash
 nsh run                       # 带托盘的完整应用（当前平台后端）
 nsh package --target linux|macos|windows
+```
+
+无图形环境时可用终端后端快速验证（不需要 GTK / WebKit / 显示服务）：
+
+```bash
+nsh run --target tui
 ```
 
 `cargo run` 仍可直接运行 Rust 端（无托盘），便于快速迭代：

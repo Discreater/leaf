@@ -22,18 +22,18 @@ pub struct Controller;
 #[module]
 impl Controller {
     /// Reloads `appsettings.json` and reschedules the next reminder.
-    pub fn reload_settings() {
+    pub fn reload_settings(_cx: &mut ModuleCx) {
         reload_settings();
     }
 
     /// Shows the reminder now.
-    pub fn remind_now() {
+    pub fn remind_now(_cx: &mut ModuleCx) {
         remind_now();
     }
 
     /// Quits the app, tray icon included.
-    pub fn quit() {
-        quit();
+    pub fn quit(_cx: &mut ModuleCx) {
+        nsh_core::element::desktop::quit();
     }
 }
 

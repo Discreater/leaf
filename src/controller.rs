@@ -96,12 +96,20 @@ pub fn start() {
     set_application_menu(application_menu());
     hide_to_tray_on_close();
 
+    // The reminder is forced above normal windows and raised once when it
+    // starts; it returns to normal stacking when it ends. The state signal
+    // notifies every second (the tick), so act only when the phase actually
+    // flips, not on every tick.
+    let was_reminder = stored(false);
     effect(move || {
-        if is_reminder() {
-            // The reminder floats above normal windows (macOS / Windows);
-            // focus also raises it on Linux, where window levels are a
-            // no-op in nsh's GTK backend, and shows it again when the user
-            // had closed it to the tray.
+        let reminder = is_reminder();
+        if was_reminder.replace(reminder) == reminder {
+            return;
+        }
+        if reminder {
+            // `Floating` keeps the window above normal windows for the whole
+            // reminder on macOS and Windows. GTK 4 (Linux) has no window
+            // levels, so there the window is only shown and focused once.
             set_window_level(WindowLevel::Floating);
             main_window().focus();
         } else {

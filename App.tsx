@@ -10,6 +10,7 @@ import icon from "./assets/leaf.svg";
 /** The root: the tray icon and the Rust window content. */
 function Root() {
   const main = currentWindow();
+  main.setBounds({ size: { width: 480, height: 320 } });
   Tray.set({
     icon,
     tooltip: "Leaf 休息提醒",

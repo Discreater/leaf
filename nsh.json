@@ -3,5 +3,6 @@
   "id": "dev.leaf.breakreminder",
   "version": "1.0.0",
   "appearance": "system",
-  "rust": "."
+  "rust": ".",
+  "window": { "defaultSize": { "width": 480, "height": 320 } }
 }

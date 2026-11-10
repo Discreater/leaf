@@ -1,7 +1,7 @@
 {
   "name": "Leaf",
   "id": "dev.leaf.breakreminder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "appearance": "system",
   "rust": ".",
   "window": { "defaultSize": { "width": 480, "height": 320 } }
